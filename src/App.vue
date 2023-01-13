@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref ,onMounted} from 'vue';
 import AutoScrollList from './components/auto-scroll-list.vue';
 
 const d = Array.from({ length: 10 }).map((_, index) => ({
@@ -10,7 +10,13 @@ const d = Array.from({ length: 10 }).map((_, index) => ({
 }));
 
 
-const list = ref(d);
+const list = ref([]);
+
+onMounted(()=>{
+  setTimeout(()=>{
+    list.value = d
+  },2000)
+})
 
 </script>
 
@@ -36,7 +42,7 @@ p {
 }
 
 .t {
-  height: 324px;
+  height: 300px;
 }
 
 .flex1 {
@@ -48,8 +54,8 @@ p {
 
 .item {
   background: #050A28;
-//height: 84px; color: #fff;
-  padding: 30px 0;
+height: 30px; color: #fff;
+  padding: 10px 0;
   display: flex;
   align-items: center;
 }

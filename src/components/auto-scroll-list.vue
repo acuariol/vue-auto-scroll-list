@@ -1,5 +1,5 @@
 <template>
-  <div class="box" ref="box" @mouseleave="onMouseLeave" @mouseenter="onMouseEnter">
+  <div class="box" ref="box">
     <template v-for="(item,index) of list">
       <slot name="item" v-bind:item="item" v-bind:index="index"></slot>
     </template>
@@ -27,6 +27,13 @@ export default {
       return 0;
     },
   },
+  watch: {
+    list() {
+      this.$nextTick(() => {
+        this.setup();
+      });
+    },
+  },
   data() {
     return {
       boxRef: null,
@@ -41,9 +48,19 @@ export default {
     this.boxRef = this.$refs['box'];
     // console.log(this.boxRef.scrollHeight);
     // console.log(this.boxRef.offsetHeight);
-    this.autoScroll();
+    this.setup();
   },
   methods: {
+    setup() {
+      if (this.boxRef && (this.boxRef.offsetHeight < this.boxRef.scrollHeight)) {
+        this.addMouseEvent();
+        this.autoScroll();
+      }
+    },
+    addMouseEvent() {
+      this.boxRef.onmouseleave = this.onMouseLeave;
+      this.boxRef.onmouseenter = this.onMouseEnter;
+    },
     stopAutoScroll() {
       clearInterval(this.timer);
       this.timer = null;
@@ -57,7 +74,6 @@ export default {
     autoScroll() {
       this.timer = setInterval(() => {
         this.current += 1;
-
         if (this.current >= this.list.length) {
           this.current = 0;
         }
@@ -71,7 +87,9 @@ export default {
       //   scrollTop: this.boxRef.scrollTop,
       // });
 
-      const isBottom = this.boxRef.offsetHeight + this.boxRef.scrollTop >= this.boxRef.scrollHeight;
+      const { offsetHeight, scrollTop, scrollHeight } = this.boxRef;
+      const isBottom = offsetHeight + scrollTop >= scrollHeight;
+
       let top = this.current * this.itemHeight;
 
       if (isBottom) {
